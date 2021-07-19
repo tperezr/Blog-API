@@ -13,6 +13,7 @@ El usuario deberá tener los siguientes campos
 - 
 Se debe usar Spring Security para la autenticación, pudiendo cambiar los campos del
 usuario. Preferentemente autenticar utilizando JWT.
+
 Cada post deberá contener los siguientes campos:
 
 - ID
@@ -28,16 +29,16 @@ Los endpoints que deberá exponer la API son:
 Los endpoints de authenticación podrian cambiar segun la gema utilizada, pero para utilizar
 de guía se sugiere:
 
-POST /auth/sign_up
+#### POST /auth/sign_up
 
 Se debe enviar email y contraseña y se creara un nuevo usuario con esos datos.
 
-POST /auth/login
+#### POST /auth/login
 
 Se debe enviar usuario y contraseña para luego poder utilizar cualquiera de los endpoints
 siguientes
 
-GET /posts
+#### GET /posts
 
 Deberá mostrar un listado de posts, ordenados por fecha de creación, en forma
 descendente. Este listado deberá mostrar solamente los campos ID, título, imagen,
@@ -51,20 +52,21 @@ Se deberá poder filtrar por título y/o categoría.
 
 /posts?titulo=TITULO&category=CATEGORY
 
-GET /posts/:id
+#### GET /posts/:id
 
 Deberá buscar un post cuyo id sea el especificado en el parámetro :id. Si existe, devolver
 sus detalles, caso contrario devolver un mensaje de error.
 
-POST /posts
+#### POST /posts
 
 Deberá guardar un nuevo post según los datos recibidos en la petición.
-PATCH /posts/:id
+
+#### PATCH /posts/:id
 
 Deberá actualizar el post con el id especificado en el parámetro :id, y actualizar sus datos
 según el cuerpo de la petición. En el caso de que no exista, devolver un mensaje de error.
 
-DELETE /posts/:id
+#### DELETE /posts/:id
 
 Deberá eliminar el post con el id especificado en el parámetro :id. En el caso de que no
 exista, devolver un mensaje de error.
