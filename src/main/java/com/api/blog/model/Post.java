@@ -1,6 +1,5 @@
 package com.api.blog.model;
 
-import ch.qos.logback.core.boolex.EvaluationException;
 import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
