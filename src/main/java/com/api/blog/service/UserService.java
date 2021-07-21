@@ -1,5 +1,6 @@
 package com.api.blog.service;
 
+import com.api.blog.dto.UserDto;
 import com.api.blog.model.RequestRegister;
 import com.api.blog.model.User;
 import com.api.blog.repository.UserRepository;
@@ -40,7 +41,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public Boolean signUpUser(RequestRegister userRegister){
+    public Boolean signUpUser(UserDto userRegister){
         boolean existsUser = userRepository.findByEmail(userRegister.getEmail()).isPresent();
         User user;
         if(!existsUser){
