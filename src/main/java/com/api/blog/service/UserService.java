@@ -1,11 +1,9 @@
 package com.api.blog.service;
 
 import com.api.blog.dto.UserDto;
-import com.api.blog.model.RequestRegister;
 import com.api.blog.model.User;
 import com.api.blog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-@Service("userDetailsService")
+@Service
 public class UserService implements UserDetailsService {
 
     @Autowired
@@ -35,7 +33,7 @@ public class UserService implements UserDetailsService {
                 new org.springframework.security.core.userdetails.User(
                         user.get().getEmail(),
                         user.get().getPassword(),
-                        new ArrayList<GrantedAuthority>()
+                        new ArrayList<>()
                 );
         return userDetails;
     }
