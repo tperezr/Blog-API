@@ -6,10 +6,14 @@ import com.api.blog.repository.CategoryRepository;
 import com.api.blog.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -73,12 +77,17 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public void updatePost(Post post) {
-        Boolean isExistsPost = postRepository.findById(post.getId()).isPresent();
-        if(!isExistsPost){
+    public void updatePost(Long id, Map<Object,Object> fields) throws IllegalArgumentException, NullPointerException{
+        Optional<Post> post = postRepository.findById(id);
+        if(post.isEmpty()){
             throw new IllegalArgumentException("Not existing post");
         }
-        postRepository.save(post);
+        fields.forEach((key, value) -> {
+            Field field = ReflectionUtils.findField(Post.class,(String) key);
+            field.setAccessible(true);
+            ReflectionUtils.setField(field,post.get(),value);
+        });
+        postRepository.save(post.get());
     }
 
     @Override
