@@ -9,9 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -76,8 +79,8 @@ public class PostController {
     public ResponseEntity getPostById(@PathVariable Long id){
         Optional<Post> post = postService.findPostById(id);
         return post.isEmpty() ?
-                ResponseEntity.status(HttpStatus.NO_CONTENT).body(null) :
-                ResponseEntity.accepted().body(createPostDto(post.get()));
+                new ResponseEntity(HttpStatus.NO_CONTENT) :
+                ResponseEntity.ok(createPostDto(post.get()));
     }
 
     @PostMapping
@@ -97,8 +100,17 @@ public class PostController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity updatePost(){
-        return null;
+    public ResponseEntity updatePost(@PathVariable Long id, @RequestBody Map<Object,Object> fields){
+        try{
+            postService.updatePost(id,fields);
+        } catch (IllegalArgumentException e){
+            //Post not found
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (NullPointerException e){
+            return ResponseEntity.badRequest().body("Invalid fields");
+        }
+
+        return ResponseEntity.ok("Successfully updated");
     }
 
     private PostDto createPostDto(Post post){
