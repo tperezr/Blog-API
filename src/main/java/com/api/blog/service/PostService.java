@@ -1,6 +1,5 @@
 package com.api.blog.service;
 
-import com.api.blog.model.Category;
 import com.api.blog.model.Post;
 
 import java.util.List;
@@ -9,20 +8,20 @@ import java.util.Optional;
 
 public interface PostService {
 
-    public List<Post> findAllPostsDetailsOrdByDate();
+    List<Post> findAllPostsDetailsOrdByDate();
 
-    public List<Post> findAllPostsByTitle(String title);
+    List<Post> findAllPostsByTitle(String title);
 
-    public List<Post> findAllPostsByCategory(String category);
+    List<Post> findAllPostsByCategory(String category);
 
-    public List<Post> findAllPostsByTitleAndCategory(String title, String category);
+    List<Post> findAllPostsByTitleAndCategory(String title, String category);
 
-    public Optional<Post> findPostById(Long id);
+    Optional<Post> findPostById(Long id);
 
-    public void savePost(Post post);
+    void savePost(Post post);
 
-    public void updatePost(Long id, Map<Object,Object> fields);
+    void updatePost(Long id, Map<Object,Object> fields);
 
-    public void deletePost(Long id);
+    void deletePost(Long id);
 
 }
