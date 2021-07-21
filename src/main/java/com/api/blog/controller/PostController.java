@@ -6,13 +6,9 @@ import com.api.blog.model.Post;
 import com.api.blog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +29,7 @@ public class PostController {
     }
 
     @GetMapping(params = "title")
-    public ResponseEntity getPostsByTitle(@RequestParam String title){
+    public ResponseEntity<?> getPostsByTitle(@RequestParam String title){
         if(title.isBlank()){
             return ResponseEntity.badRequest().body("Title can not be empty");
         }
@@ -43,7 +39,7 @@ public class PostController {
     }
 
     @GetMapping(params = "category")
-    public ResponseEntity getPostsByCategory(@RequestParam String category){
+    public ResponseEntity<?> getPostsByCategory(@RequestParam String category){
         if(category.isBlank()){
             return ResponseEntity.badRequest().body("Category can not be empty");
         }
@@ -60,7 +56,7 @@ public class PostController {
     }
 
     @GetMapping(params = {"title","category"})
-    public ResponseEntity getPostsByCategory(@RequestParam String title, @RequestParam String category){
+    public ResponseEntity<?> getPostsByCategory(@RequestParam String title, @RequestParam String category){
         if(title.isBlank() || category.isBlank()){
             return ResponseEntity.badRequest().body("Category and title can not be empty");
         }
@@ -76,21 +72,21 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity getPostById(@PathVariable Long id){
+    public ResponseEntity<?> getPostById(@PathVariable Long id){
         Optional<Post> post = postService.findPostById(id);
         return post.isEmpty() ?
-                new ResponseEntity(HttpStatus.NO_CONTENT) :
+                new ResponseEntity<>(HttpStatus.NO_CONTENT) :
                 ResponseEntity.ok(createPostDto(post.get()));
     }
 
     @PostMapping
-    public ResponseEntity savePost(@RequestBody Post post){
+    public ResponseEntity<?> savePost(@RequestBody Post post){
         postService.savePost(post);
         return ResponseEntity.ok("Successfully saved");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deletePost(@PathVariable Long id){
+    public ResponseEntity<?> deletePost(@PathVariable Long id){
         try{
             postService.deletePost(id);
         } catch (IllegalArgumentException e){
@@ -100,7 +96,7 @@ public class PostController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity updatePost(@PathVariable Long id, @RequestBody Map<Object,Object> fields){
+    public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody Map<Object,Object> fields){
         try{
             postService.updatePost(id,fields);
         } catch (IllegalArgumentException e){
