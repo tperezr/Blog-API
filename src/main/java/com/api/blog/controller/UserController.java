@@ -1,7 +1,6 @@
 package com.api.blog.controller;
 
 import com.api.blog.dto.UserDto;
-import com.api.blog.model.User;
 import com.api.blog.service.UserService;
 import com.api.blog.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ public class UserController {
     private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody UserDto userLogin){
+    public ResponseEntity<String> login(@RequestBody UserDto userLogin){
         try {
             authenticate(userLogin.getEmail(),userLogin.getPassword());
         } catch (Exception e) {
@@ -45,7 +44,7 @@ public class UserController {
     }
 
     @PostMapping("/sign_up")
-    public ResponseEntity singUp(@RequestBody UserDto userSignUp){
+    public ResponseEntity<String> singUp(@RequestBody UserDto userSignUp){
         if(userService.signUpUser(userSignUp)) {
             return ResponseEntity.ok("Registro exitoso");
         }
