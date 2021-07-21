@@ -4,6 +4,7 @@ import com.api.blog.model.Category;
 import com.api.blog.model.Post;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface PostService {
@@ -20,7 +21,7 @@ public interface PostService {
 
     public void savePost(Post post);
 
-    public void updatePost(Post post);
+    public void updatePost(Long id, Map<Object,Object> fields);
 
     public void deletePost(Long id);
 
