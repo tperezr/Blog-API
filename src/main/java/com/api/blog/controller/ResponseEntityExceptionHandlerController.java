@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import javax.validation.ConstraintViolationException;
 
 @ControllerAdvice
-public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler {
+public class ResponseEntityExceptionHandlerController extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {ConstraintViolationException.class})
     protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request){
