@@ -14,7 +14,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/posts")
@@ -58,14 +57,14 @@ public class PostController {
         if(postsDto != null){
             return ResponseEntity.ok(postsDto);
         }
-        return ResponseEntity.badRequest().body("Invalid parameters");
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getPostById(
             @Min(value = 1,message = "must be >= 1") @PathVariable Long id){
-        Optional<PostDto> postDto = postService.findPostById(id);
-        return postDto.isEmpty() ?
+        PostDto postDto = postService.findPostById(id);
+        return postDto == null ?
                 new ResponseEntity<>(HttpStatus.NO_CONTENT) :
                 ResponseEntity.ok(postDto);
     }
