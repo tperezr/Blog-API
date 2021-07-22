@@ -18,7 +18,7 @@ public interface PostService {
 
     List<PostDetailsDto> findAllPostsDetailsByTitleAndCategory(String title, String category);
 
-    Optional<PostDto> findPostById(Long id);
+    PostDto findPostById(Long id);
 
     void savePost(Post post);
 
