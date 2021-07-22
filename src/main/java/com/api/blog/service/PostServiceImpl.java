@@ -70,8 +70,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<PostDto> findPostById(Long id) {
+    public PostDto findPostById(Long id) {
         Optional<Post> post = postRepository.findById(id);
+        PostDto postDto;
+        if(post.isPresent()){
+            postDto = createPostDto(post.get());
+            return postDto;
+        }
         return null;
     }
 
@@ -98,6 +103,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public Boolean deletePost(Long id) throws IllegalArgumentException{
         Optional<Post> post = postRepository.findById(id);
         if(post.isEmpty()){
