@@ -1,5 +1,7 @@
 package com.api.blog.service;
 
+import com.api.blog.dto.PostDetailsDto;
+import com.api.blog.dto.PostDto;
 import com.api.blog.model.Category;
 import com.api.blog.model.Post;
 import com.api.blog.repository.CategoryRepository;
@@ -14,6 +16,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -26,46 +29,50 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Post> findAllPostsDetailsOrdByDate() {
+    public List<PostDetailsDto> findAllPostsDetailsOrdByDate() {
         List<Post> posts = postRepository.
                 findAll(Sort.by(Sort.Direction.DESC,"fechaCreacion"));
-        return posts;
+        List<PostDetailsDto> postDetailsDto = createPostsDetailsDto(posts);
+        return postDetailsDto;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Post> findAllPostsByTitle(String title) {
+    public List<PostDetailsDto> findAllPostsDetailsByTitle(String title) {
         List<Post> posts = postRepository.findAllByTitulo(title);
-        return posts;
+        List<PostDetailsDto> postsDetailsDto = createPostsDetailsDto(posts);
+        return postsDetailsDto.isEmpty() ? null : postsDetailsDto;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Post> findAllPostsByCategory(String categoryName) throws IllegalArgumentException{
+    public List<PostDetailsDto> findAllPostsDetailsByCategory(String categoryName) throws IllegalArgumentException{
         Optional<Category> category = categoryRepository.findByNombre(categoryName);
         if(category.isEmpty()){
-            throw new IllegalArgumentException();
+            return null;
         }
         List<Post> posts = postRepository.findAllByCategoria(category.get());
-        return posts;
+        List<PostDetailsDto> postsDetailsDto = createPostsDetailsDto(posts);
+        return postsDetailsDto.isEmpty() ? null : postsDetailsDto;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Post> findAllPostsByTitleAndCategory(String title, String categoryName) throws IllegalArgumentException{
+    public List<PostDetailsDto> findAllPostsDetailsByTitleAndCategory(String title, String categoryName) throws IllegalArgumentException{
         Optional<Category> category = categoryRepository.findByNombre(categoryName);
         if(category.isEmpty()){
-            throw new IllegalArgumentException();
+            return null;
         }
         List<Post> posts = postRepository.findAllByTituloAndCategoria(title,category.get());
-        return posts;
+        List<PostDetailsDto> postsDetailsDto = createPostsDetailsDto(posts);
+        return postsDetailsDto.isEmpty() ? null : postsDetailsDto;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Post> findPostById(Long id) {
+    public Optional<PostDto> findPostById(Long id) {
         Optional<Post> post = postRepository.findById(id);
-        return post;
+        return null;
     }
 
     @Override
@@ -91,11 +98,37 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void deletePost(Long id) throws IllegalArgumentException{
+    public Boolean deletePost(Long id) throws IllegalArgumentException{
         Optional<Post> post = postRepository.findById(id);
         if(post.isEmpty()){
-            throw new IllegalArgumentException("Id post invalid");
+          return false;
         }
         postRepository.delete(post.get());
+        return true;
+    }
+
+    private PostDto createPostDto(Post post){
+        PostDto postDto = new PostDto(
+                post.getId(),
+                post.getTitulo(),
+                post.getContenido(),
+                post.getImagen(),
+                post.getFechaCreacion(),
+                post.getCategoria().getNombre(),
+                post.getUsuario().getEmail()
+        );
+        return postDto;
+    }
+
+    private List<PostDetailsDto> createPostsDetailsDto(List<Post> posts){
+        List<PostDetailsDto> postsDto = posts.stream()
+                .map(post -> new PostDetailsDto(
+                        post.getId(),
+                        post.getTitulo(),
+                        post.getImagen(),
+                        post.getCategoria().getNombre(),
+                        post.getFechaCreacion()
+                )).collect(Collectors.toList());
+        return postsDto;
     }
 }
