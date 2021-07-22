@@ -7,15 +7,18 @@ import com.api.blog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/posts")
+@Validated
 public class PostController {
 
     @Autowired
@@ -23,60 +26,48 @@ public class PostController {
 
     @GetMapping
     public List<PostDetailsDto> getPostsDetails(){
-        List<Post> posts = postService.findAllPostsDetailsOrdByDate();
-        List<PostDetailsDto> postsDto = createPostsDetailsDto(posts);
+        List<PostDetailsDto> postsDto = postService.findAllPostsDetailsOrdByDate();
         return postsDto;
     }
 
     @GetMapping(params = "title")
-    public ResponseEntity<?> getPostsByTitle(@RequestParam String title){
-        if(title.isBlank()){
-            return ResponseEntity.badRequest().body("Title can not be empty");
+    public ResponseEntity<?> getPostsByTitle(
+            @NotBlank(message = "can not be empty") @RequestParam String title){
+        List<PostDetailsDto> postDetailsDto = postService.findAllPostsDetailsByTitle(title);
+        if(postDetailsDto != null){
+            return ResponseEntity.ok(postDetailsDto);
         }
-        List<Post> posts = postService.findAllPostsByTitle(title);
-        List<PostDetailsDto> postsDto = createPostsDetailsDto(posts);
-        return ResponseEntity.ok(postsDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping(params = "category")
-    public ResponseEntity<?> getPostsByCategory(@RequestParam String category){
-        if(category.isBlank()){
-            return ResponseEntity.badRequest().body("Category can not be empty");
+    public ResponseEntity<?> getPostsByCategory(
+            @NotBlank(message = "can not be empty") @RequestParam String category){
+        List<PostDetailsDto> postsDto = postService.findAllPostsDetailsByCategory(category);
+        if(postsDto != null){
+            return ResponseEntity.ok(postsDto);
         }
-        List<Post> posts;
-        List<PostDetailsDto> postsDto;
-        try{
-            posts = postService.findAllPostsByCategory(category);
-            postsDto = createPostsDetailsDto(posts);
-        } catch(IllegalArgumentException e){
-            return ResponseEntity.badRequest().body("Invalid category");
-        }
-
-        return ResponseEntity.ok(postsDto);
+        return ResponseEntity.badRequest().body("Invalid category");
     }
 
     @GetMapping(params = {"title","category"})
-    public ResponseEntity<?> getPostsByCategory(@RequestParam String title, @RequestParam String category){
-        if(title.isBlank() || category.isBlank()){
-            return ResponseEntity.badRequest().body("Category and title can not be empty");
+    public ResponseEntity<?> getPostsByCategory(
+            @NotBlank(message = "can not be empty") @RequestParam String title,
+            @NotBlank(message = "can not be empty") @RequestParam String category){
+        List<PostDetailsDto> postsDto = postService.findAllPostsDetailsByTitleAndCategory(title,category);
+        if(postsDto != null){
+            return ResponseEntity.ok(postsDto);
         }
-        List<Post> posts;
-        List<PostDetailsDto> postsDto;
-        try{
-            posts = postService.findAllPostsByTitleAndCategory(title,category);
-            postsDto = createPostsDetailsDto(posts);
-        } catch(IllegalArgumentException e){
-            return ResponseEntity.badRequest().body("Invalid category");
-        }
-        return ResponseEntity.ok(postsDto);
+        return ResponseEntity.badRequest().body("Invalid parameters");
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getPostById(@PathVariable Long id){
-        Optional<Post> post = postService.findPostById(id);
-        return post.isEmpty() ?
+    public ResponseEntity<?> getPostById(
+            @Min(value = 1,message = "must be >= 1") @PathVariable Long id){
+        Optional<PostDto> postDto = postService.findPostById(id);
+        return postDto.isEmpty() ?
                 new ResponseEntity<>(HttpStatus.NO_CONTENT) :
-                ResponseEntity.ok(createPostDto(post.get()));
+                ResponseEntity.ok(postDto);
     }
 
     @PostMapping
@@ -86,17 +77,19 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePost(@PathVariable Long id){
-        try{
-            postService.deletePost(id);
-        } catch (IllegalArgumentException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<?> deletePost(
+            @Min(value = 1,message = "must be >= 1") @PathVariable Long id){
+        Boolean wasDeleted = postService.deletePost(id);
+        if(wasDeleted){
+            return ResponseEntity.ok("Deleted");
         }
-        return ResponseEntity.ok("Deleted");
+        return ResponseEntity.badRequest().body("Invalid id post");
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody Map<Object,Object> fields){
+    public ResponseEntity<?> updatePost(
+            @Min(value = 1,message = "must be >= 1") @PathVariable Long id,
+            @RequestBody Map<Object,Object> fields){
         try{
             postService.updatePost(id,fields);
         } catch (IllegalArgumentException e){
@@ -107,30 +100,5 @@ public class PostController {
         }
 
         return ResponseEntity.ok("Successfully updated");
-    }
-
-    private PostDto createPostDto(Post post){
-        PostDto postDto = new PostDto(
-                post.getId(),
-                post.getTitulo(),
-                post.getContenido(),
-                post.getImagen(),
-                post.getFechaCreacion(),
-                post.getCategoria().getNombre(),
-                post.getUsuario().getEmail()
-        );
-        return postDto;
-    }
-
-    private List<PostDetailsDto> createPostsDetailsDto(List<Post> posts){
-        List<PostDetailsDto> postsDto = posts.stream()
-                .map(post -> new PostDetailsDto(
-                        post.getId(),
-                        post.getTitulo(),
-                        post.getImagen(),
-                        post.getCategoria().getNombre(),
-                        post.getFechaCreacion()
-                )).collect(Collectors.toList());
-        return postsDto;
     }
 }
