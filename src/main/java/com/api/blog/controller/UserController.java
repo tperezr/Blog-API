@@ -10,13 +10,17 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/auth")
+@Validated
 public class UserController {
 
     @Autowired
@@ -29,7 +33,7 @@ public class UserController {
     private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserDto userLogin){
+    public ResponseEntity<String> login(@Valid @RequestBody UserDto userLogin){
         try {
             authenticate(userLogin.getEmail(),userLogin.getPassword());
         } catch (Exception e) {
@@ -44,7 +48,7 @@ public class UserController {
     }
 
     @PostMapping("/sign_up")
-    public ResponseEntity<String> singUp(@RequestBody UserDto userSignUp){
+    public ResponseEntity<String> singUp(@Valid @RequestBody UserDto userSignUp){
         if(userService.signUpUser(userSignUp)) {
             return ResponseEntity.ok("Registro exitoso");
         }
