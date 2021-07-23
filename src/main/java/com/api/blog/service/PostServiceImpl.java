@@ -10,7 +10,6 @@ import com.api.blog.repository.PostRepository;
 import com.api.blog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
@@ -169,12 +168,7 @@ public class PostServiceImpl implements PostService {
     private Boolean testImage(String url){
         try {
             BufferedImage image = ImageIO.read(new URL(url));
-            if(image != null){
-                return true;
-            } else{
-                return false;
-            }
-
+            return image != null;
         } catch (IOException e) {
             return false;
         }

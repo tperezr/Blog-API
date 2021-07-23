@@ -2,11 +2,9 @@ package com.api.blog.service;
 
 import com.api.blog.dto.PostDetailsDto;
 import com.api.blog.dto.PostDto;
-import com.api.blog.model.Post;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public interface PostService {
 
