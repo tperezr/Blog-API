@@ -13,10 +13,10 @@ import javax.validation.ConstraintViolationException;
 @ControllerAdvice
 public class ResponseEntityExceptionHandlerController extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = {ConstraintViolationException.class})
-    protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request){
-        int index = ex.getMessage().lastIndexOf('.');
-        String message = ex.getMessage().substring(index+1);
+    @ExceptionHandler({ConstraintViolationException.class})
+    protected ResponseEntity<Object> handleConstraintViolation(RuntimeException ex, WebRequest request){
+        String message = "Invalid fields or empty";
         return handleExceptionInternal(ex, message, new HttpHeaders(),HttpStatus.BAD_REQUEST,request);
     }
+
 }

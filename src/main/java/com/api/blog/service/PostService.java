@@ -20,7 +20,7 @@ public interface PostService {
 
     PostDto findPostById(Long id);
 
-    void savePost(Post post);
+    Boolean savePost(PostDto post);
 
     void updatePost(Long id, Map<Object,Object> fields);
 

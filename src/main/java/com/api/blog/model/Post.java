@@ -1,15 +1,20 @@
 package com.api.blog.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @SQLDelete(sql = "update post set is_deleted = 1 where id =?")
 @Where(clause = "is_deleted = 0")
 public class Post {
