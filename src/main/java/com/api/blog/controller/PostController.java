@@ -2,7 +2,6 @@ package com.api.blog.controller;
 
 import com.api.blog.dto.PostDetailsDto;
 import com.api.blog.dto.PostDto;
-import com.api.blog.model.Post;
 import com.api.blog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
@@ -70,9 +70,11 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<?> savePost(@RequestBody Post post){
-        postService.savePost(post);
-        return ResponseEntity.ok("Successfully saved");
+    public ResponseEntity<?> savePost(@Valid @RequestBody PostDto post){
+        if(postService.savePost(post)){
+            return ResponseEntity.ok("Successfully saved");
+        }
+        return ResponseEntity.badRequest().body("Invalid fields");
     }
 
     @DeleteMapping("/{id}")

@@ -4,15 +4,22 @@ import com.api.blog.dto.PostDetailsDto;
 import com.api.blog.dto.PostDto;
 import com.api.blog.model.Category;
 import com.api.blog.model.Post;
+import com.api.blog.model.User;
 import com.api.blog.repository.CategoryRepository;
 import com.api.blog.repository.PostRepository;
+import com.api.blog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +33,9 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -82,8 +92,26 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public void savePost(Post post) {
-        postRepository.save(post);
+    public Boolean savePost(PostDto postDto) {
+        if (testImage(postDto.getImagen())) {
+            Optional<Category> categoria = categoryRepository.findByNombre(postDto.getCategoria());
+            Optional<User> usuario = userRepository.findByEmail(postDto.getUsuario());
+            if(usuario.isPresent() && categoria.isPresent()){
+                Post post = new Post(
+                        null,
+                        postDto.getTitulo(),
+                        postDto.getContenido(),
+                        postDto.getImagen(),
+                        postDto.getFechaCreacion(),
+                        false,
+                        categoria.get(),
+                        usuario.get()
+                );
+                postRepository.save(post);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -136,5 +164,19 @@ public class PostServiceImpl implements PostService {
                         post.getFechaCreacion()
                 )).collect(Collectors.toList());
         return postsDto;
+    }
+
+    private Boolean testImage(String url){
+        try {
+            BufferedImage image = ImageIO.read(new URL(url));
+            if(image != null){
+                return true;
+            } else{
+                return false;
+            }
+
+        } catch (IOException e) {
+            return false;
+        }
     }
 }
